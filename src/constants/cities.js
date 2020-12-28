@@ -51,4 +51,4 @@ const cities = [
   'Zaragoza',
 ];
 
-module.exports(); // Exportamos el módulo para poder utilizarlo en otro archivo.
+module.exports = cities; // Exportamos el módulo para poder utilizarlo en otro archivo.

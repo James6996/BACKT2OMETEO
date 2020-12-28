@@ -1,5 +1,7 @@
 require('dotenv').config();
 const fetch = require('node-fetch');
+const fs = require('fs');
+const path = require('path');
 
 const cities = require('../constants/cities');
 const { getCitiesCoords, getCitiesWeather } = require('../constants/openWeather');
@@ -8,30 +10,46 @@ const { getCitiesCoords, getCitiesWeather } = require('../constants/openWeather'
 
 const dailyScript = async () => {
   try {
-    const citiesCoordsPromise = cities.map((city) => {
-      const coordsApi = getCitiesCoords(city);
-      return fetch(coordsApi).then((res) => res.json());
+    const citiesCoordsPromises = cities.map((city) => {
+      const coordApi = getCitiesCoords(city);
+      return fetch(coordApi)
+        .then((res) => res.json())
+        .then((content) => console.log(content));
     });
 
-    const citiesCoords = await Promise.all(citiesCoordsPromise);
-    const citisCoordsResult = citiesCoords.map(({ name, coord }) => ({
+    const citiesCoords = await Promise.all(citiesCoordsPromises);
+    const citiesCoordsResult = citiesCoords.map(({ name, coord }) => ({
       name,
-      lat: coord.lat,
       lon: coord.lon,
+      lat: coord.lat,
     }));
+    console.log(citiesCoordsResult);
 
-    const weatherPromise = citisCoordsResult.map(({ lat, lon }) => {
+    const weatherPromise = citiesCoordsResult.map(({ lat, lon }) => {
       const weatherApi = getCitiesWeather(lat, lon);
       return fetch(weatherApi).then((res) => res.json());
     });
 
-    const citiesWeather = await Promise.all(weatherPromises);
-    
+    const citiesWeather = await Promise.all(weatherPromise);
+
     // Hemos utilizado el mismo proceso dos veces con promesas, ya que primero se realiza una entera y luego la siguiente,
     // y en caso de haya algún problema se parará y saltará un error donde hay fallado. Este erro lo hará el catch, más abajo *
+
     // El siguiente paso tendrá que ser formatear los datos que nos trae la API ya que no llegan como esperamos.
-  }
-  catch (err) { // *
+
+    const result = citiesCoordsResult.map((coordResult, index) => ({
+      ...coordResult,
+      daily: citiesWeather[index].daily.map(({ dt, temp }) => ({
+        date: new Date(dt * 1000), // Multiplicamos por 1000 porque viene en segundo de la API
+        temp: temp.day, // Viene en Farenheits (hay más para cada momento del día: min, max, night...)
+      })),
+    }));
+    console.log(result);
+
+    const filePath = path.join(__dirname);
+    fs.writeFileSync(filePath, JSON.stringify(result));
+  } catch (err) {
     console.log('Weather dailyScript error:', err);
   }
 };
+dailyScript();

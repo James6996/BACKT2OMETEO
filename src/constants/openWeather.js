@@ -1,4 +1,5 @@
-const BASE_URL = 'http://api.openweathermap.org/data/2.5/';
+BASE_URL = 'http://api.openweathermap.org/data/2.5/' 
+BASE_URL_2 = 'https://api.openweathermap.org/data/2.5/'
 
 const API_ID = process.env.API_ID;
 
@@ -8,9 +9,12 @@ const API_ID = process.env.API_ID;
 
 const getCitiesCoords = (city) => `${BASE_URL}weather?q=${city},ES&appid=${API_ID}`;
 
-const getCitiesWeather = (lat, long) =>
-  `${BASE_URL}onecall?lat=${lat}&lon=${long}&exclude='minutely','hourly','alerts'&appid=${API_APP_ID}`;
+const getCitiesWeather = (lat, lon) =>
+  `${BASE_URL_2}onecall?lat=${lat}&lon=${lon}&exclude='minutely','hourly','alert'&appid=${API_ID}`;
 
 // Ahora exportamos ambas constantes
 
-module.exports(getCitiesCoords, getCitiesWeather);
+module.exports = {
+    getCitiesCoords,
+    getCitiesWeather
+};
