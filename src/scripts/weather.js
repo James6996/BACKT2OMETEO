@@ -5,7 +5,6 @@ const path = require('path');
 
 const cities = require('../constants/cities');
 const { getWeather } = require('../constants/openWeather');
-const { json } = require('express');
 
 // Hacemos este script el cual sería interesante llamar una vez al día para traer información lo más actual posible
 
@@ -26,18 +25,17 @@ const dailyScript = async () => {
       })
     );
     const mapCitiesWeather = citiesWeather.map((city) => {
-      const i = city['list'].lenght;
-      console.log(i);
       return {
-        
         name: city.city.name,
-        date: city['list'][i]['dt'],
-        threeHoursDate: city['list'][i]['dt_txt'],
-        temperature: city['list'][i]['temp']
+        forecast: city.list.map((forecast) => {
+          return {
+            date: forecast.dt,
+            temperature: (forecast.main.temp - 273.15).toFixed(2),
+            dateThreeHours: forecast.dt_txt,
+          };
+        }),
       };
     });
-
-    console.log(citiesWeather);
 
     const filePath = path.join(__dirname, './weather.json');
     fs.writeFileSync(filePath, JSON.stringify(mapCitiesWeather));
