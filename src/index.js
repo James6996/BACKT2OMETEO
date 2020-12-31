@@ -11,11 +11,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 // Introduciendo cors podremos usar nuestro server desde el front
 
+const allCities = require('./routes/allCities.route')
+
 MongoClient.connect(url, function (err, db) {
   if (err) throw err;
   console.log('Connected to BD!!');
   db.close();
 });
+
+app.use('/api/all-cities', allCities);
 
 const PORT = Number(process.env.PORT || 3000);
 // Declaro el puerto como tipo number, añadimos una variable de entorno o en su defecto el puerto 3000
