@@ -2,10 +2,14 @@ require('dotenv').config();
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
+const addSeconds = require('date-fns/addSeconds')
 const MongoClient = require('mongodb').MongoClient;
 const url = 'mongodb+srv://t2ometeo-forecast:t2ometeo-forecast@t2ometeo.zrpjh.mongodb.net';
 const cities = require('../constants/cities');
 const { getWeather } = require('../constants/openWeather');
+
+const today = new Date (1970,1,1);
+
 
 // Hacemos este script el cual sería interesante llamar una vez al día para traer información lo más actual posible
 
@@ -33,8 +37,8 @@ const dailyScript = async () => {
           name: city.city.name,
           forecast: city.list.map((forecast) => {
             return {
-              date: forecast.dt,
-              temperature: (forecast.main.temp - 273.15).toFixed(2),
+              date: addSeconds(new Date(1970,1,1), forecast.dt) , // sumar estos segundos al 1-1-1970 para obtener la fecha actual.
+              temperature: Math.round(forecast.main.temp - 273.15),
               dateThreeHours: forecast.dt_txt,
             };
           })
@@ -49,8 +53,8 @@ const dailyScript = async () => {
         name: city.city.name,
         forecast: city.list.map((forecast) => {
           return {
-            date: forecast.dt,
-            temperature: (forecast.main.temp - 273.15).toFixed(2),
+            date: addSeconds(new Date(1970,0,1,1), forecast.dt) , // sumar estos segundos al 1-1-1970 para obtener la fecha actual.
+            temperature: Math.round(forecast.main.temp - 273.15),
             dateThreeHours: forecast.dt_txt,
           };
         }),
