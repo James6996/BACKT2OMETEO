@@ -1,15 +1,16 @@
 const express = require('express');
 const MongoClient = require('mongodb').MongoClient;
-const url = 'mongodb+srv://t2ometeo-forecast:t2ometeo-forecast@t2ometeo.zrpjh.mongodb.net';
+
 const router = express.Router();
 
-router.get('/all-cities', async (req, res) => {
+router.get('/', (req, res) => {
   try {
-    MongoClient.connect(url, function (err, db) {
+    MongoClient.connect(process.env.DB_URL, async (err, mongoClient) => {
       if (err) throw err;
-      var dbo = db.db('t2ometeo-forecast');
-      const cities =  dbo.collection('forecast').find();
 
+      const db = mongoClient.db(process.env.DB_NAME);
+
+      const cities = await db.collection('forecast').find({}).toArray();
       return res.status(200).json({ data: cities });
     });
   } catch (err) {
