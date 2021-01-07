@@ -7,7 +7,6 @@ const url = 'mongodb+srv://t2ometeo-forecast:t2ometeo-forecast@t2ometeo.zrpjh.mo
 const cities = require('../constants/cities');
 const { getWeather } = require('../constants/openWeather');
 
-const today = new Date(1970, 1, 1);
 
 
 const dailyScript = async () => {
@@ -63,13 +62,16 @@ const dailyScript = async () => {
                 return !isInArray(currentForecastDates, date);
               });
 
-              const newDates = filteredNewDates.length !== 0 || null ? filteredNewDates : null;
+              
+              const newDates = filteredNewDates.length !== 0 ? filteredNewDates : [];
+
+              const mapOldDates = res.forecast.filter(item => newDates.some(date => item.dateThreeHours === date) )
 
               dbo
                 .collection('forecast')
                 .updateOne(
                   { name: city.city.name },
-                  { $set: { forecast: [...res.forecast, ...filteredNewDates, newDates] } },
+                  { $set: { forecast: [...res.forecast,  ...mapOldDates] } },
                   function (err, res) {
                     if (err) throw err;
                     console.log('1 document updated');
@@ -96,4 +98,4 @@ const dailyScript = async () => {
     console.log('Weather dailyScript error:', err);
   }
 };
-dailyScript();
+module.exports = { dailyScript };
