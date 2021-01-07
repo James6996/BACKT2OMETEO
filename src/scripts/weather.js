@@ -9,7 +9,6 @@ const { getWeather } = require('../constants/openWeather');
 
 const today = new Date(1970, 1, 1);
 
-// Hacemos este script el cual sería interesante llamar una vez al día para traer información lo más actual posible
 
 const dailyScript = async () => {
   try {
