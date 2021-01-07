@@ -4,6 +4,9 @@ const MongoClient = require('mongodb').MongoClient;
 const router = express.Router();
 
 router.get('/', (req, res) => {
+  console.log('check')
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "X-Requested-With");
   try {
     MongoClient.connect(process.env.DB_URL, async (err, mongoClient) => {
       if (err) throw err;
